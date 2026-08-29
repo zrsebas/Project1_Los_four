@@ -1,20 +1,20 @@
 // Datos de películas
 const moviesData = [
-    { title: "The Shawshank Redemption", year: 1994, genre: "Drama" },
-    { title: "The Godfather", year: 1972, genre: "Crime" },
-    { title: "The Dark Knight", year: 2008, genre: "Action" },
-    { title: "Pulp Fiction", year: 1994, genre: "Crime" },
+    { title: "La Redención", year: 1994, genre: "Drama" },
+    { title: "El Padrino", year: 1972, genre: "Crimen" },
+    { title: "El Caballero de la Noche", year: 2008, genre: "Acción" },
+    { title: "Tiempos Violentos", year: 1994, genre: "Crimen" },
     { title: "Forrest Gump", year: 1994, genre: "Drama" },
-    { title: "Inception", year: 2010, genre: "Sci-Fi" },
-    { title: "Fight Club", year: 1999, genre: "Drama" },
-    { title: "The Matrix", year: 1999, genre: "Sci-Fi" },
-    { title: "Goodfellas", year: 1990, genre: "Crime" },
-    { title: "Interstellar", year: 2014, genre: "Sci-Fi" },
-    { title: "The Lion King", year: 1994, genre: "Animation" },
-    { title: "Jurassic Park", year: 1993, genre: "Sci-Fi" },
-    { title: "Titanic", year: 1997, genre: "Drama" },
-    { title: "Avatar", year: 2009, genre: "Sci-Fi" },
-    { title: "The Avengers", year: 2012, genre: "Action" }
+    { title: "Inicio", year: 2010, genre: "Ciencia Ficción" },
+    { title: "El Club de la Pelea", year: 1999, genre: "Drama" },
+    { title: "Matrix", year: 1999, genre: "Ciencia Ficción" },
+    { title: "Buenos Muchachos", year: 1990, genre: "Crimen" },
+    { title: "Interestelar", year: 2014, genre: "Ciencia Ficción" },
+    { title: "El Rey León", year: 1994, genre: "Animación" },
+    { title: "Parque Jurásico", year: 1993, genre: "Ciencia Ficción" },
+    { title: "Titánic", year: 1997, genre: "Drama" },
+    { title: "Avatar", year: 2009, genre: "Ciencia Ficción" },
+    { title: "Los Vengadores", year: 2012, genre: "Acción" }
 ];
 
 // Función para contar películas por año
