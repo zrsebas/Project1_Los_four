@@ -9,11 +9,8 @@
 * **Análisis estadístico:** Visualizar gráficas interactivas de películas por año y género
 * **Diseño responsivo:** Experiencia optimizada para dispositivos de cualquier tamaño
 
-## Integrantes del Equipo (Los Four)
-* **Juan Sebastián Cortés Montoya**
-* **Sebastián Zapata Rendón**
-* **Camilo Guzmán**
-* **David Ruiz**
+## Integrante
+**Juan Sebastian Cortes Montoya**
 
 ## Características Principales
 
