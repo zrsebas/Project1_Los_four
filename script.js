@@ -15,7 +15,7 @@ async function loadMoviesFromCSV() {
 // Función para parsear el CSV
 function parseCSV(csvText) {
     const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',');
+    const headers = lines[0].split(',').map(h => h.trim());
     const movies = [];
 
     for (let i = 1; i < lines.length; i++) {
@@ -23,7 +23,7 @@ function parseCSV(csvText) {
         const currentLine = lines[i].split(',');
 
         for (let j = 0; j < headers.length; j++) {
-            obj[headers[j]] = currentLine[j];
+            obj[headers[j]] = currentLine[j].trim();
         }
         movies.push(obj);
     }
