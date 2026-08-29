@@ -1,34 +1,31 @@
-// Función para cargar el CSV
-async function loadMoviesFromCSV() {
+// Datos de películas embebidos
+const moviesData = [
+    { title: "La Redención", year: 1994, genre: "Drama", rating: "9.3", director: "Frank Darabont" },
+    { title: "El Padrino", year: 1972, genre: "Crimen|Drama", rating: "9.2", director: "Francis Ford Coppola" },
+    { title: "El Caballero de la Noche", year: 2008, genre: "Acción|Crimen|Drama", rating: "9.0", director: "Christopher Nolan" },
+    { title: "Tiempos Violentos", year: 1994, genre: "Crimen|Drama", rating: "8.9", director: "Quentin Tarantino" },
+    { title: "Forrest Gump", year: 1994, genre: "Drama|Romance", rating: "8.8", director: "Robert Zemeckis" },
+    { title: "Inicio", year: 2010, genre: "Acción|Ciencia Ficción|Suspenso", rating: "8.8", director: "Christopher Nolan" },
+    { title: "El Club de la Pelea", year: 1999, genre: "Drama|Suspenso", rating: "8.8", director: "David Fincher" },
+    { title: "Matrix", year: 1999, genre: "Acción|Ciencia Ficción", rating: "8.7", director: "The Wachowskis" },
+    { title: "Buenos Muchachos", year: 1990, genre: "Crimen|Drama", rating: "8.7", director: "Martin Scorsese" },
+    { title: "Interestelar", year: 2014, genre: "Aventura|Drama|Ciencia Ficción", rating: "8.6", director: "Christopher Nolan" },
+    { title: "El Rey León", year: 1994, genre: "Animación|Aventura|Drama", rating: "8.5", director: "Roger Allers" },
+    { title: "Parque Jurásico", year: 1993, genre: "Acción|Aventura|Ciencia Ficción", rating: "8.2", director: "Steven Spielberg" },
+    { title: "Titánic", year: 1997, genre: "Drama|Romance", rating: "7.9", director: "James Cameron" },
+    { title: "Avatar", year: 2009, genre: "Acción|Aventura|Fantasía|Ciencia Ficción", rating: "7.8", director: "James Cameron" },
+    { title: "Los Vengadores", year: 2012, genre: "Acción|Aventura|Ciencia Ficción", rating: "8.0", director: "Joss Whedon" }
+];
+
+// Función para cargar películas
+function loadMoviesFromCSV() {
     try {
-        const response = await fetch('movies_initial.csv');
-        const csvText = await response.text();
-        const movies = parseCSV(csvText);
-        displayMovies(movies);
+        displayMovies(moviesData);
     } catch (error) {
         console.error('Error cargando películas:', error);
         document.getElementById('movies-container').innerHTML = 
             '<div class="alert alert-danger">Error cargando las películas</div>';
     }
-}
-
-// Función para parsear el CSV
-function parseCSV(csvText) {
-    const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',').map(h => h.trim());
-    const movies = [];
-
-    for (let i = 1; i < lines.length; i++) {
-        const obj = {};
-        const currentLine = lines[i].split(',');
-
-        for (let j = 0; j < headers.length; j++) {
-            obj[headers[j]] = currentLine[j].trim();
-        }
-        movies.push(obj);
-    }
-
-    return movies;
 }
 
 // Función para mostrar las películas
