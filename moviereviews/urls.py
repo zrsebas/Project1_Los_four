@@ -25,6 +25,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', movieViews.home),
     path('about/', movieViews.about),
+    path('news/', movieViews.news),
+    path('charts/year/', movieViews.movies_by_year),
+    path('charts/genre/', movieViews.movies_by_genre),
+    path('charts/movies/', movieViews.movies_by_movie),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Movies (individual) by Year{% endblock %}
+{% block content %}
+  <h1>Movies — Year per Movie</h1>
+  <div style="height:420px;">
+    <canvas id="chartMovie" style="width:100%;height:100%;"></canvas>
+  </div>
+
+  <script>
+    const labels = {{ labels|safe }};
+    const values = {{ values|safe }};
+
+    const ctx = document.getElementById('chartMovie').getContext('2d');
+    // compute dynamic y-range to ensure visible spread between years
+    const numericValues = values.map(v => Number(v));
+    const minY = Math.min(...numericValues);
+    const maxY = Math.max(...numericValues);
+    const pad = Math.max(2, Math.round((maxY - minY) * 0.1));
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Year',
+          data: values,
+          borderColor: 'rgba(75, 192, 192, 0.9)',
+          backgroundColor: 'rgba(75, 192, 192, 0.4)',
+          fill: false,
+          tension: 0.2,
+          pointRadius: 6,
+          pointHoverRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { min: minY - pad, max: maxY + pad, title: { display: true, text: 'Year' } },
+          x: {
+            ticks: { maxRotation: 45, minRotation: 25 },
+            title: { display: true, text: 'Movie' }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label(context) {
+                const idx = context.dataIndex;
+                return `${labels[idx]} — ${context.parsed.y}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
+{% endblock %}

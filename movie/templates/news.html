@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}News - Movies{% endblock %}
+{% block content %}
+  <h1>News</h1>
+  <div class="list-group"> 
+    {% for item in news_items %}
+      <div class="card mb-3">
+        <div class="row g-0 align-items-center">
+          <div class="col-md-4">
+            {% if item.image %}
+              <img src="{{ item.image.url }}" class="img-fluid rounded-start" alt="{{ item.title }}">
+            {% else %}
+              <svg class="bd-placeholder-img img-fluid rounded-start" width="100%" height="150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#868e96"></rect></svg>
+            {% endif %}
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">{{ item.title }}</h5>
+              <p class="card-text">{{ item.desc }}</p>
+              {% if item.url %}
+                <a href="{{ item.url }}" class="btn btn-sm btn-primary">Leer más</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="alert alert-info">No news items yet. Add them in the admin panel.</div>
+    {% endfor %}
+  </div>
+{% endblock %}

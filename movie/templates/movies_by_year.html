@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Movies by Year{% endblock %}
+{% block content %}
+  <h1>Movies by Year</h1>
+  <div style="height:360px;">
+    <canvas id="chartYear" style="width:100%;height:100%;"></canvas>
+  </div>
+
+  <script>
+    const labels = {{ labels|safe }};
+    const values = {{ values|safe }};
+    const yearTitles = {{ year_titles|safe }};
+
+    const ctx = document.getElementById('chartYear').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Movies count',
+          data: values,
+          backgroundColor: labels.map((_, i) => `hsl(${i * 45 % 360} 70% 55% / 0.8)`)
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Count' } },
+          x: { title: { display: true, text: 'Year' } }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true,
+            callbacks: {
+              title(context) {
+                return context[0].label;
+              },
+              label(context) {
+                const label = context.label || '';
+                const count = context.parsed.y;
+                const titles = yearTitles[label] || [];
+                return `${count} movie(s): ${titles.join(', ')}`;
+              }
+            }
+          }
+        }
+      },
+      plugins: [{
+        id: 'valueLabels',
+        afterDatasetsDraw(chart) {
+          const ctx = chart.ctx;
+          chart.data.datasets.forEach((dataset, dsIndex) => {
+            const meta = chart.getDatasetMeta(dsIndex);
+            meta.data.forEach((bar, index) => {
+              const val = dataset.data[index];
+              ctx.save();
+              ctx.fillStyle = '#000';
+              ctx.font = '12px sans-serif';
+              ctx.textAlign = 'center';
+              ctx.fillText(val, bar.x, bar.y - 6);
+              ctx.restore();
+            });
+          });
+        }
+      }]
+    });
+
+    // Render a detailed list/table below the chart
+    const details = document.getElementById('year-details');
+    if (details) {
+      let html = '<div class="mt-4"><h5>Movies by Year (detail)</h5><div class="list-group">';
+      labels.forEach(year => {
+        const titles = yearTitles[year] || [];
+        html += `<div class="list-group-item"><strong>${year}</strong> — ${titles.length} movie(s)<br><small>${titles.join(', ')}</small></div>`;
+      });
+      html += '</div></div>';
+      details.innerHTML = html;
+    }
+  </script>
+  <div id="year-details"></div>
+{% endblock %}

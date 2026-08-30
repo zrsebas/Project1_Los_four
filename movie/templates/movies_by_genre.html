@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Movies by Genre{% endblock %}
+{% block content %}
+  <h1>Movies by Genre</h1>
+  <div style="height:360px;">
+    <canvas id="chartGenre" style="width:100%;height:100%;"></canvas>
+  </div>
+
+  <script>
+    const labels = {{ labels|safe }};
+    const values = {{ values|safe }};
+
+    // Generate distinct colors dynamically based on number of labels
+    const backgroundColors = labels.map((_, i) => `hsl(${Math.round(i * 360 / labels.length)} 70% 55% / 0.85)`);
+
+    const ctx = document.getElementById('chartGenre').getContext('2d');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Movies by genre',
+          data: values,
+          backgroundColor: backgroundColors
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right' },
+          tooltip: { enabled: true }
+        }
+      },
+      plugins: [{
+        id: 'pieValueLabels',
+        afterDraw(chart) {
+          const ctx = chart.ctx;
+          const datasets = chart.data.datasets;
+          if (!datasets.length) return;
+          const meta = chart.getDatasetMeta(0);
+          meta.data.forEach((arc, index) => {
+            const dataset = datasets[0];
+            const value = dataset.data[index];
+            const center = arc.getCenterPoint();
+            ctx.save();
+            ctx.fillStyle = '#000';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(value, center.x, center.y);
+            ctx.restore();
+          });
+        }
+      }]
+    });
+  </script>
+{% endblock %}
