@@ -1,0 +1,32 @@
+body {
+  background-color: #f5f6f8;
+}
+
+.navbar-logo {
+  filter: invert(1);
+}
+
+.movie-card img {
+  height: 340px;
+  object-fit: cover;
+}
+
+.movie-card .card-title {
+  min-height: 3rem;
+}
+
+.news-card img {
+  object-fit: cover;
+  height: 100%;
+  min-height: 160px;
+}
+
+#moviesContainer .card,
+#newsContainer .card {
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+#moviesContainer .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.12);
+}
