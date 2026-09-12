@@ -38,3 +38,9 @@ pytest -q
 ## Commits sugeridos para el equipo
 
 Cada integrante debe realizar un commit descriptivo desde su cuenta. Ejemplos: `feat: agrega registro de transacciones`, `feat: implementa metas de ahorro`, `docs: documenta arquitectura y mockups`, `test: cubre flujo de registro`.
+
+## Equipo y documentación
+
+Este proyecto pertenece al equipo Los Four. La documentación técnica y de gestión está disponible en la [Wiki del repositorio](https://github.com/zrsebas/Project1_Los_four/wiki).
+
+Integrantes: Juan Sebastián Cortés Montoya, Sebastián Zapata Rendón, Camilo Guzmán y David Ruiz.
