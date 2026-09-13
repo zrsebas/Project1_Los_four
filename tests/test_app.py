@@ -110,6 +110,23 @@ def test_monthly_salary_is_included_in_available_balance(client):
     assert b"$ 700.000" in response.data
 
 
+def test_monthly_salary_can_be_deleted_and_no_longer_limits_savings(client):
+    client.post("/registro", data={"email": "ana@example.com", "password": "password123"})
+    client.post("/sueldo", data={"amount": "700000"})
+    client.post("/categorias/guardar", data={"name": "Arriendo", "amount": "500000"})
+    client.post("/metas", data={"name": "Viaje", "target_amount": "1000000", "deadline": "2026-12-20"})
+    with app.app_context():
+        category_id = get_db().execute("SELECT id FROM money_categories").fetchone()["id"]
+    client.post("/transacciones", data={"type": "expense", "amount": "25000", "category_id": category_id, "payment_method": "cash", "transaction_date": "2026-09-11"})
+    response = client.post("/sueldo/eliminar", follow_redirects=True)
+    assert b"Todo quedo en cero" in response.data
+    with app.app_context():
+        assert get_db().execute("SELECT COUNT(*) AS total FROM monthly_salaries").fetchone()["total"] == 0
+        assert get_db().execute("SELECT COUNT(*) AS total FROM money_categories").fetchone()["total"] == 0
+        assert get_db().execute("SELECT COUNT(*) AS total FROM savings_goals").fetchone()["total"] == 0
+        assert get_db().execute("SELECT COUNT(*) AS total FROM transactions").fetchone()["total"] == 0
+
+
 def test_saved_category_is_not_an_expense(client):
     client.post("/registro", data={"email": "ana@example.com", "password": "password123"})
     response = client.post("/categorias/guardar", data={"name": "Arriendo", "amount": "300000"}, follow_redirects=True)

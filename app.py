@@ -261,6 +261,26 @@ def save_salary():
     return redirect(url_for("dashboard"))
 
 
+@app.post("/sueldo/eliminar")
+@login_required
+def delete_salary():
+    db = get_db()
+    user_id = session["user_id"]
+    deleted = db.execute(
+        "DELETE FROM monthly_salaries WHERE user_id = ?",
+        (user_id,),
+    )
+    db.execute("DELETE FROM transactions WHERE user_id = ?", (user_id,))
+    db.execute("DELETE FROM savings_goals WHERE user_id = ?", (user_id,))
+    db.execute("DELETE FROM money_categories WHERE user_id = ?", (user_id,))
+    db.commit()
+    if deleted.rowcount:
+        flash("Datos financieros reiniciados. Todo quedo en cero.", "success")
+    else:
+        flash("Datos financieros reiniciados. Todo quedo en cero.", "success")
+    return redirect(url_for("dashboard"))
+
+
 @app.post("/categorias/guardar")
 @login_required
 def save_money_category():
