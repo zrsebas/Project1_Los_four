@@ -55,6 +55,60 @@
   text-align: right;
 }
 
+.payment-usage-panel {
+  margin-top: 18px;
+}
+
+.payment-usage-chart {
+  display: grid;
+  gap: 20px;
+  max-width: 760px;
+}
+
+.payment-usage-row > div:first-child,
+.payment-usage-row > div:first-child span {
+  display: flex;
+  align-items: center;
+}
+
+.payment-usage-row > div:first-child {
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.payment-usage-row span {
+  gap: 9px;
+  color: var(--muted);
+}
+
+.payment-usage-row span i {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 11px;
+  border-radius: 50%;
+  background: var(--payment-color);
+}
+
+.payment-usage-row strong {
+  white-space: nowrap;
+}
+
+.payment-usage-track {
+  height: 14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(21, 35, 28, 0.08);
+}
+
+.payment-usage-track i {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background: var(--payment-color);
+}
+
 @container (max-width: 720px) {
   .daily-expenses-content {
     grid-template-columns: 1fr;

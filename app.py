@@ -206,6 +206,27 @@ def dashboard():
     daily_expense_colors = [
         "#1F8F5F", "#F4845F", "#356A9A", "#D6A93A", "#7A68A6", "#36A3A0", "#C75B79"
     ]
+    payment_usage_rows = db.execute(
+        """SELECT payment_method, COUNT(*) AS uses FROM transactions
+           WHERE user_id = ? AND payment_method IN ('cash', 'card', 'transfer')
+           GROUP BY payment_method""",
+        (session["user_id"],),
+    ).fetchall()
+    payment_usage_by_method = {row["payment_method"]: row["uses"] for row in payment_usage_rows}
+    payment_method_counts = [
+        {
+            "label": "Efectivo",
+            "uses": payment_usage_by_method.get("cash", 0),
+            "color": "#1F8F5F",
+        },
+        {
+            "label": "Tarjeta / transferencia",
+            "uses": payment_usage_by_method.get("card", 0)
+            + payment_usage_by_method.get("transfer", 0),
+            "color": "#F4845F",
+        },
+    ]
+    payment_method_max = max(item["uses"] for item in payment_method_counts)
     monthly_salary = salary["amount"] if salary else 0
     balance = monthly_salary + totals["income"] - totals["expense"]
     recommendation, recommendation_source = build_recommendation(
@@ -218,6 +239,9 @@ def dashboard():
         daily_expenses=daily_expenses,
         daily_expense_total=sum(item["amount"] for item in daily_expenses),
         daily_expense_colors=daily_expense_colors,
+        payment_method_counts=payment_method_counts,
+        payment_method_total=sum(item["uses"] for item in payment_method_counts),
+        payment_method_max=payment_method_max,
         today=date.today().isoformat(), salary=salary, money_categories=money_categories,
         category_total=category_total,
     )

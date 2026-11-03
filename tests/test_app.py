@@ -261,3 +261,24 @@ def test_dashboard_shows_daily_expenses_for_last_seven_days(client):
     assert b"25.000" in response.data
     assert b"10.000" in response.data
     assert b"35.000" in response.data
+
+
+def test_dashboard_counts_cash_and_card_or_transfer_usage(client):
+    client.post("/registro", data={"email": "ana@example.com", "password": "password123"})
+    client.post("/categorias/guardar", data={"name": "Comida", "amount": "100000"})
+    with app.app_context():
+        category_id = get_db().execute("SELECT id FROM money_categories").fetchone()["id"]
+
+    for method in ("cash", "cash", "card", "transfer"):
+        client.post("/transacciones", data={
+            "type": "expense", "amount": "1000", "category_id": category_id,
+            "payment_method": method, "transaction_date": date.today().isoformat(),
+        })
+
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert b"Usos registrados" in response.data
+    assert b"Efectivo" in response.data
+    assert b"Tarjeta / transferencia" in response.data
+    assert response.data.count(b"2 usos") == 2
