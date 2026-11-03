@@ -251,6 +251,13 @@ def test_dashboard_shows_daily_expenses_for_last_seven_days(client):
     assert response.status_code == 200
     assert b"Gastos por d\xc3\xada" in response.data
     assert b"daily-expenses-chart" in response.data
+    spanish_months = (
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+    )
+    today = date.today()
+    full_date = f"{today.day} de {spanish_months[today.month - 1]} de {today.year}"
+    assert full_date.encode() in response.data
     assert b"25.000" in response.data
     assert b"10.000" in response.data
     assert b"35.000" in response.data

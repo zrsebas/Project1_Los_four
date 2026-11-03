@@ -18,8 +18,8 @@
 
 .daily-expenses-legend {
   display: grid;
-  grid-template-columns: repeat(2, minmax(160px, 1fr));
-  gap: 10px 24px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
 }
 
 .daily-expenses-legend > div,
@@ -37,6 +37,7 @@
 
 .daily-expenses-legend span {
   gap: 9px;
+  min-width: 0;
   color: var(--muted);
 }
 
@@ -49,13 +50,13 @@
 }
 
 .daily-expenses-legend strong {
+  flex: 0 0 auto;
   white-space: nowrap;
   text-align: right;
 }
 
 @container (max-width: 720px) {
-  .daily-expenses-content,
-  .daily-expenses-legend {
+  .daily-expenses-content {
     grid-template-columns: 1fr;
   }
 
@@ -66,8 +67,7 @@
 }
 
 @media (max-width: 980px) {
-  .daily-expenses-content,
-  .daily-expenses-legend {
+  .daily-expenses-content {
     grid-template-columns: 1fr;
   }
 

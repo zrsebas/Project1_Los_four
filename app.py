@@ -13,6 +13,10 @@ BASE_DIR = Path(__file__).resolve().parent
 DATABASE = BASE_DIR / "finanzas.db"
 load_dotenv(BASE_DIR / ".env")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+SPANISH_MONTH_NAMES = (
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+)
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-key-change-me")
@@ -192,7 +196,7 @@ def dashboard():
     daily_totals_by_date = {row["transaction_date"]: row["total"] for row in daily_totals}
     daily_expenses = [
         {
-            "label": (first_chart_day + timedelta(days=offset)).strftime("%d/%m"),
+            "label": format_spanish_date(first_chart_day + timedelta(days=offset)),
             "amount": daily_totals_by_date.get(
                 (first_chart_day + timedelta(days=offset)).isoformat(), 0
             ),
@@ -217,6 +221,10 @@ def dashboard():
         today=date.today().isoformat(), salary=salary, money_categories=money_categories,
         category_total=category_total,
     )
+
+
+def format_spanish_date(value):
+    return f"{value.day} de {SPANISH_MONTH_NAMES[value.month - 1]} de {value.year}"
 
 
 def build_recommendation(balance, expenses, categories):
