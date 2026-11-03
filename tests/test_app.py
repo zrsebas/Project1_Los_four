@@ -1,10 +1,13 @@
 import pytest
+import requests
+from unittest.mock import patch
 
 from app import app, get_db
 
 
 @pytest.fixture()
-def client(tmp_path):
+def client(tmp_path, monkeypatch):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     app.config.update(TESTING=True, DATABASE=str(tmp_path / "test.db"), SECRET_KEY="test")
     with app.test_client() as client:
         with app.app_context():
@@ -194,3 +197,29 @@ def test_goal_contribution_over_salary_is_rejected(client):
     with app.app_context():
         goal = get_db().execute("SELECT current_amount FROM savings_goals").fetchone()
         assert goal["current_amount"] == 0
+
+
+def test_dashboard_uses_gemini_recommendation(client, monkeypatch):
+    client.post("/registro", data={"email": "ana@example.com", "password": "password123"})
+    monkeypatch.setenv("GEMINI_API_KEY", "test-api-key")
+    with patch("app.requests.post") as post:
+        post.return_value.json.return_value = {
+            "candidates": [{"content": {"parts": [{"text": "Reserva una parte de tus ingresos para tu meta."}]}}]
+        }
+        response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert b"Reserva una parte de tus ingresos" in response.data
+    assert b"Recomendaci\xc3\xb3n generada con Gemini" in response.data
+    assert post.call_args.kwargs["headers"]["x-goog-api-key"] == "test-api-key"
+
+
+def test_dashboard_falls_back_when_gemini_is_unavailable(client, monkeypatch):
+    client.post("/registro", data={"email": "ana@example.com", "password": "password123"})
+    monkeypatch.setenv("GEMINI_API_KEY", "test-api-key")
+    with patch("app.requests.post", side_effect=requests.Timeout):
+        response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert b"Registra tu primer gasto" in response.data
+    assert b"Recomendaci\xc3\xb3n local" in response.data
