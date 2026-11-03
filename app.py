@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from datetime import date
+from datetime import date, timedelta
 from functools import wraps
 from pathlib import Path
 
@@ -181,6 +181,27 @@ def dashboard():
            WHERE user_id = ? AND type = 'expense' GROUP BY category ORDER BY total DESC LIMIT 5""",
         (session["user_id"],),
     ).fetchall()
+    today = date.today()
+    first_chart_day = today - timedelta(days=6)
+    daily_totals = db.execute(
+        """SELECT transaction_date, SUM(amount) AS total FROM transactions
+           WHERE user_id = ? AND type = 'expense' AND transaction_date BETWEEN ? AND ?
+           GROUP BY transaction_date""",
+        (session["user_id"], first_chart_day.isoformat(), today.isoformat()),
+    ).fetchall()
+    daily_totals_by_date = {row["transaction_date"]: row["total"] for row in daily_totals}
+    daily_expenses = [
+        {
+            "label": (first_chart_day + timedelta(days=offset)).strftime("%d/%m"),
+            "amount": daily_totals_by_date.get(
+                (first_chart_day + timedelta(days=offset)).isoformat(), 0
+            ),
+        }
+        for offset in range(7)
+    ]
+    daily_expense_colors = [
+        "#1F8F5F", "#F4845F", "#356A9A", "#D6A93A", "#7A68A6", "#36A3A0", "#C75B79"
+    ]
     monthly_salary = salary["amount"] if salary else 0
     balance = monthly_salary + totals["income"] - totals["expense"]
     recommendation, recommendation_source = build_recommendation(
@@ -190,6 +211,9 @@ def dashboard():
         "dashboard.html", transactions=transactions, goals=goals, totals=totals,
         balance=balance, categories=categories, recommendation=recommendation,
         recommendation_source=recommendation_source,
+        daily_expenses=daily_expenses,
+        daily_expense_total=sum(item["amount"] for item in daily_expenses),
+        daily_expense_colors=daily_expense_colors,
         today=date.today().isoformat(), salary=salary, money_categories=money_categories,
         category_total=category_total,
     )

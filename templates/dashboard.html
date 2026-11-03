@@ -12,6 +12,9 @@
 		</section>
 		<section class="panel insight"><p class="eyebrow">{{ recommendation_source }}</p><h2>Una idea para ti</h2><p class="insight-text">{{ recommendation }}</p><div class="mini-bars">{% for category in categories %}<div><span><small>{{ category['category'] }}</small><small>$ {{ "{:,.0f}".format(category['total']).replace(',', '.') }}</small></span><i style="width: {{ [100, (category['total'] / categories[0]['total'] * 100)|round|int]|min }}%"></i></div>{% endfor %}</div></section>
 	</div>
+	<section class="panel daily-expenses-panel"><div class="panel-heading"><div><p class="eyebrow">ULTIMOS SIETE DIAS</p><h2>Gastos por día</h2></div><strong>$ {{ "{:,.0f}".format(daily_expense_total).replace(',', '.') }}</strong></div>
+		{% if daily_expense_total %}<div class="daily-expenses-content"><div class="daily-expenses-chart"><canvas id="daily-expenses-chart" role="img" aria-label="Gráfico de pastel con los egresos diarios de los últimos siete días"></canvas></div><div class="daily-expenses-legend" aria-label="Totales diarios de egresos">{% for item in daily_expenses %}<div><span><i style="--daily-color: {{ daily_expense_colors[loop.index0] }}"></i>{{ item['label'] }}</span><strong>$ {{ "{:,.0f}".format(item['amount']).replace(',', '.') }}</strong></div>{% endfor %}</div></div>{% else %}<p class="empty">No hay egresos registrados en los últimos siete días.</p>{% endif %}
+	</section>
 		<div class="forms-grid"><section class="panel form-panel"><p class="eyebrow">NUEVO MOVIMIENTO</p><h2>Registrar transaccion</h2><form method="post" action="{{ url_for('add_transaction') }}" class="form compact"><div class="two-col"><label>Tipo<select name="type"><option value="expense">Egreso</option><option value="income">Ingreso</option></select></label><label>Monto<input name="amount" type="number" min="1" step="0.01" placeholder="0" required></label></div><div class="two-col"><label>Categoria<select name="category_id" required><option value="">Selecciona una categoria</option>{% for category in money_categories %}<option value="{{ category['id'] }}">{{ category['name'] }}</option>{% endfor %}</select></label><label>Tipo de pago<select name="payment_method"><option value="cash">Efectivo</option><option value="card">Tarjeta/Transferencia</option></select></label></div><div class="two-col"><label>Fecha<input name="transaction_date" type="date" value="{{ today }}" required></label><label>Descripcion<input name="description" placeholder="Ej. almuerzo"></label></div><button class="button primary" type="submit">Guardar movimiento</button></form></section>
 		<section class="panel form-panel"><p class="eyebrow">META DE AHORRO</p><h2>Un siguiente paso</h2><form method="post" action="{{ url_for('add_goal') }}" class="form compact"><label>Nombre de la meta<input name="name" placeholder="Viaje de fin de semestre" required></label><div class="two-col"><label>Objetivo<input name="target_amount" type="number" min="1" step="0.01" placeholder="500000" required></label><label>Fecha limite<input name="deadline" type="date" required></label></div><button class="button secondary" type="submit">Crear meta</button></form>{% if goals %}<div class="goals">{% for goal in goals %}<div class="goal"><div><strong>{{ goal['name'] }}</strong><small>$ {{ "{:,.0f}".format(goal['current_amount']).replace(',', '.') }} de $ {{ "{:,.0f}".format(goal['target_amount']).replace(',', '.') }}</small></div><div class="progress"><i style="width: {{ [100, (goal['current_amount'] / goal['target_amount'] * 100)|round|int]|min }}%"></i></div><form method="post" action="{{ url_for('contribute_goal', goal_id=goal['id']) }}" class="contribute-form" data-salary="{{ salary['amount'] if salary else 0 }}"><input name="amount" type="number" min="1" step="0.01" placeholder="Cuanto vas a ahorrar" required><button class="button secondary" type="submit">Agregar plata</button></form><form method="post" action="{{ url_for('delete_goal', goal_id=goal['id']) }}" class="goal-delete-form"><button class="goal-delete-button" type="submit">Eliminar meta</button></form></div>{% endfor %}</div>{% endif %}</section>
 	</div>
@@ -33,4 +36,44 @@
 		});
 	});
 </script>
+{% if daily_expense_total %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+	const dailyExpenseCanvas = document.getElementById('daily-expenses-chart');
+	if (dailyExpenseCanvas && window.Chart) {
+		const dailyExpenseLabels = {{ daily_expenses | map(attribute='label') | list | tojson }};
+		const dailyExpenseValues = {{ daily_expenses | map(attribute='amount') | list | tojson }};
+		const dailyExpenseColors = {{ daily_expense_colors | tojson }};
+		new Chart(dailyExpenseCanvas, {
+			type: 'pie',
+			data: {
+				labels: dailyExpenseLabels,
+				datasets: [{
+					data: dailyExpenseValues,
+					backgroundColor: dailyExpenseColors,
+					borderColor: '#ffffff',
+					borderWidth: 3
+				}]
+			},
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				plugins: {
+					legend: { display: false },
+					tooltip: {
+						callbacks: {
+							label(context) {
+								const amount = new Intl.NumberFormat('es-CO', {
+									style: 'currency', currency: 'COP', maximumFractionDigits: 0
+								}).format(context.raw);
+								return `${context.label}: ${amount}`;
+							}
+						}
+					}
+				}
+			}
+		});
+	}
+</script>
+{% endif %}
 {% endblock %}

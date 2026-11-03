@@ -1,5 +1,6 @@
 import pytest
 import requests
+from datetime import date, timedelta
 from unittest.mock import patch
 
 from app import app, get_db
@@ -223,3 +224,33 @@ def test_dashboard_falls_back_when_gemini_is_unavailable(client, monkeypatch):
     assert response.status_code == 200
     assert b"Registra tu primer gasto" in response.data
     assert b"Recomendaci\xc3\xb3n local" in response.data
+
+
+def test_dashboard_shows_daily_expenses_for_last_seven_days(client):
+    client.post("/registro", data={"email": "ana@example.com", "password": "password123"})
+    client.post("/categorias/guardar", data={"name": "Comida", "amount": "100000"})
+    with app.app_context():
+        category_id = get_db().execute("SELECT id FROM money_categories").fetchone()["id"]
+
+    yesterday = (date.today() - timedelta(days=1)).isoformat()
+    client.post("/transacciones", data={
+        "type": "expense", "amount": "25000", "category_id": category_id,
+        "payment_method": "cash", "transaction_date": date.today().isoformat(),
+    })
+    client.post("/transacciones", data={
+        "type": "expense", "amount": "10000", "category_id": category_id,
+        "payment_method": "cash", "transaction_date": yesterday,
+    })
+    client.post("/transacciones", data={
+        "type": "income", "amount": "50000", "category_id": category_id,
+        "payment_method": "cash", "transaction_date": date.today().isoformat(),
+    })
+
+    response = client.get("/dashboard")
+
+    assert response.status_code == 200
+    assert b"Gastos por d\xc3\xada" in response.data
+    assert b"daily-expenses-chart" in response.data
+    assert b"25.000" in response.data
+    assert b"10.000" in response.data
+    assert b"35.000" in response.data
